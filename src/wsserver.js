@@ -24,11 +24,13 @@ const wss = new WebSocket.Server({
   }
 });
 
-wss.on('listening', () => {
-  console.log('server listening at ', wss.address());
-});
+const players = {};
+
+const defaultParams = require('./defaultParams');
+const Game = require('./game');
 
 const players = {};
+const game = new Game(defaultParams.defaultMap, players);
 
 const messageHandlers = {
   identify: (client, data) => {
@@ -50,6 +52,15 @@ const messageHandlers = {
     players[name] = player;
     console.log(`Player ${name} identified`);
     // TODO: Install player into game and send game status
+  },
+
+  location: (client, data) => {
+    const player = players[client.name];
+    if (!player) {
+      return;
+    }
+    player.location = data;
+    console.log(`Player "${player.name}" at lng:${data.location.lng}, lat:${data.location.lat}`);
   }
 };
 
@@ -64,4 +75,8 @@ wss.on('connection', (ws) => {
   console.log('connection!');
   wsMessaging.install(ws, messageHandlers);
   welcomePlayer(ws);
+});
+
+wss.on('listening', () => {
+  console.log('server listening at ', wss.address());
 });

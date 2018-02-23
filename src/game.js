@@ -1,6 +1,8 @@
-module.exports = class Game {
-  constructor(map) {
-    this.players = {};
+class Game {
+  constructor(map, players = {}) {
+    this.players = players;
     this.map = map;
   }
 };
+
+module.exports = Game;
