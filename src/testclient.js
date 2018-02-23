@@ -1,22 +1,21 @@
 const WebSocket = require('ws');
 
 const ws = new WebSocket('ws://::8080');
+const wsMessaging = require('./ws.messaging');
 
 const doIdentify = () => {
-  ws.send({
-    type: 'identify',
-    payload: {
-      name: 'Jocke'
-    }
+  ws.sendMessage('identify', {
+    name: 'Jocke'
   });
 };
 
-ws.on('open', function open() {
+const messageHandlers = {
+  welcome: (ws, payload) => {
+    console.log('Welcome from server: ', payload);
+  }
+};
+
+ws.on('open', () => {
+  wsMessaging.install(ws, messageHandlers);
   doIdentify();
-});
-
-const messageHandlers = {};
-
-ws.on('message', function incoming(data) {
-  console.log('SERV> ', data);
 });

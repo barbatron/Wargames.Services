@@ -1,4 +1,5 @@
 const WebSocket = require('ws');
+const wsMessaging = require('./ws.messaging');
 
 const wss = new WebSocket.Server({
   port: 8080,
@@ -23,56 +24,44 @@ const wss = new WebSocket.Server({
   }
 });
 
-const broadcast = (data, exceptClient) => {
-  // const targetClients = exceptClient
-  //   ? wss.clients.filter(client => client !== exceptSocket)
-  //   : wss.clients;
-  console.log(typeof wss.clients);
-  wss.clients.forEach((client) => {
-    if (client.readyState === WebSocket.OPEN && client !== exceptClient) {
-      client.send(data);
-    }
-  });
-};
-
 wss.on('listening', () => {
   console.log('server listening at ', wss.address());
 });
 
 const players = {};
 
-
 const messageHandlers = {
   identify: (client, data) => {
     const name = data.name;
-    debugger;
+    client.name = name;
+    if (players[name]) {
+      let existingPlayer = players[name];
+      if (existingPlayer.client.readyState === WebSocket.OPEN) {
+        console.warn(`Player named ${name} already connected`);
+        client.sendMessage('error', {message: 'Player with name already connected.'});
+      }
+      return;
+    }
+    const player = {
+      client: client,
+      name: name,
+      connectedAt: Date.now()
+    };
+    players[name] = player;
+    console.log(`Player ${name} identified`);
+    // TODO: Install player into game and send game status
   }
-}
+};
+
+const welcomePlayer = ws => {
+  ws.sendMessage('welcome', {
+    serverName: 'Jockes server',
+    serverTime: new Date().toString()
+  });
+};
 
 wss.on('connection', (ws) => {
   console.log('connection!');
-
-  ws.on('message', (message) => {
-    console.log('received: %s', message);
-    const messageType = message.type;
-    if (!messageType) {
-      console.warn('Unrecognized message');
-      return;
-    }
-    const handler = messageHandlers[messageType];
-    if (handler) {
-      handler(ws, message.payload);
-    } else {
-      console.warn('no handler for message type %s', messageType);
-    }
-  });
-
-  ws.send({
-    type: 'welcome',
-    payload: {
-      serverName: 'Jockes server',
-      serverTime: new Date().toString()
-    }
-  });
+  wsMessaging.install(ws, messageHandlers);
+  welcomePlayer(ws);
 });
-
