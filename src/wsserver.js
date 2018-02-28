@@ -29,45 +29,39 @@ const players = {};
 const defaultParams = require('./defaultParams');
 const Game = require('./game');
 
-const players = {};
 const game = new Game(defaultParams.defaultMap, players);
 
 const messageHandlers = {
-  identify
-:
-(client, data) => {
-  const name = data.name;
-  client.name = name;
-  if (players[name]) {
-    let existingPlayer = players[name];
-    if (existingPlayer.client.readyState === WebSocket.OPEN) {
-      console.warn(`Player named ${name} already connected`);
-      client.sendMessage('error', {message: 'Player with name already connected.'});
+  identify: (client, data) => {
+    const name = data.name;
+    client.name = name;
+    if (players[name]) {
+      let existingPlayer = players[name];
+      if (existingPlayer.client.readyState === WebSocket.OPEN) {
+        console.warn(`Player named ${name} already connected`);
+        client.sendMessage('error', {message: 'Player with name already connected.'});
+      }
+      return;
     }
-    return;
-  }
-  const player = {
-    client: client,
-    name: name,
-    connectedAt: Date.now()
-  };
-  players[name] = player;
-  console.log(`Player ${name} identified`);
-  // TODO: Install player into game and send game status
-},
+    const player = {
+      client: client,
+      name: name,
+      connectedAt: Date.now()
+    };
+    players[name] = player;
+    console.log(`Player ${name} identified`);
+    // TODO: Install player into game and send game status
+  },
 
-  location
-:
-(client, data) => {
-  const player = players[client.name];
-  if (!player) {
-    return;
+  location: (client, data) => {
+    const player = players[client.name];
+    if (!player) {
+      return;
+    }
+    player.location = data;
+    console.log(`Player "${player.name}" at lng:${data.location.lng}, lat:${data.location.lat}`);
   }
-  player.location = data;
-  console.log(`Player "${player.name}" at lng:${data.location.lng}, lat:${data.location.lat}`);
-}
-}
-;
+};
 
 const welcomePlayer = ws => {
   ws.sendMessage('welcome', {
