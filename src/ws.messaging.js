@@ -1,29 +1,44 @@
-const sendMessageFor = (ws) => {
-  return (messageType, payload) => {
-    const message = JSON.stringify({type: messageType, payload: payload});
-    ws.send(message);
+import {compile} from './messageType';
+
+let counter = 0;
+
+const sendMessageFor = (ws, namespace) => {
+  return (type, payload) => {
+    const messageType = compile({type, namespace});
+    const message = JSON.stringify({messageType, payload});
+    return ws.send(message);
   };
 };
 
 const messageHandlerFor = (ws, messageHandlers) => {
   return (messageStr) => {
+    counter++;
     const message = JSON.parse(messageStr);
-    const messageType = message.type;
+
+    // Establish namespace and type of message
+    const messageType = message.messageType;
     if (!messageType) {
-      console.warn('Unrecognized message');
+      console.warn(`${counter}> Unrecognized message: ${messageStr}`);
       return;
     }
+
+    // Find and invoke registered handler for composed message type
     const handler = messageHandlers[messageType];
     if (handler) {
-      handler(ws, message.payload);
+      console.log(`${counter}> Invoking handler for ${messageType} with params ${JSON.stringify(message.payload)}`);
+      const respondFn = response => {
+        console.log(`${counter}> Responding with: ${JSON.stringify(response)}`);
+        sendMessageFor(ws)(response);
+      };
+      handler(ws, message.payload, respondFn);
     } else {
-      console.warn('No handler for message type %s', messageType);
+      console.warn(`${counter}> No handler for message type`, messageType);
     }
   };
 };
 
-const install = (ws, handlers) => {
-  ws.sendMessage = sendMessageFor(ws);
+const install = (ws, handlers, namespace) => {
+  ws.sendMessage = sendMessageFor(ws, namespace);
   ws.on('message', messageHandlerFor(ws, handlers));
 };
 
