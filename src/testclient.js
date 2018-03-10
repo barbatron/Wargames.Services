@@ -1,7 +1,21 @@
 const WebSocket = require('ws');
 
+
+// INTE HAER!!!
+// INTE HAER!!!
+// INTE HAER!!!
+// INTE HAER!!!
+// INTE HAER!!!
+// INTE HAER!!!
+// INTE HAER!!!
+// INTE HAER!!!
+// INTE HAER!!!
+// INTE HAER!!!
+// INTE HAER!!!
+
+
 const ws = new WebSocket('ws://::8080');
-const wsMessaging = require('./ws.messaging');
+const wsMessaging = require('./util/ws.messaging');
 
 const doIdentify = () => {
   ws.sendMessage('identify', {

@@ -1,15 +1,20 @@
-import {namespace} from './common';
-import handlers from '../handlers/handlers';
+const namespace = require('./common').namespace;
+const handlers = require('../handlers/handlers');
 
-import handleConnect from './connect';
-import handleCreate from './createGame';
+const handleConnect = require('./connect');
+const handleCreate = require('./createGame');
 
 const commandTypes = {
   CONNECT: 'connect',
   CREATE_GAME: 'create-game'
 };
 
-handlers.register({
-  [commandTypes.CONNECT]: handleConnect,
-  [commandTypes.CREATE_GAME]: handleCreate
-}, namespace);
+console.log('adminHabdlers yeah were doing it')
+const handlersx = {
+  connect: handleConnect,
+  'create-game': handleCreate
+};
+// console.log(`adminHandlers> yeah commhanders HANDLERS=${Object.keys(handlersx)}    NAMESPACE=${ namespace}`);
+
+handlers.register(handlersx, namespace);
+

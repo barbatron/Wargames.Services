@@ -1,5 +1,7 @@
-import {compile} from '../messageType';
+const compile = require('../messageType').compile;
+const _ = require('lodash');
 
+// console.log(`handlers init: COMPILE:${compile}    LODASH:${_}`);
 /**
  * The registered message handlers.
  * @type {{}} A map of compiled message namespaces/types and their respective handlers.
@@ -18,11 +20,17 @@ const reset = () => handlers = {};
  * @param callback The callback invoked when the message occurs.
  * @param namespace (Optional) The message namespace.
  */
-const register = (type, callback, namespace) => {
-  let messageType = compile({type, namespace});
-  handlers[messageType] = callback;
-  console.log(`Registered message ${messageType} with handler`, callback.name || '(anonymous)');
-};
+const register = (messages, namespace) => {
+    Object.keys(messages).forEach(message => {
+      const callback = messages[message];
+      const type = message;
+      // console.log(`register> Iterating entries. ${message}     ${callback}`)
+      const messageType = compile({type, namespace});
+      handlers[messageType] = callback;
+      // console.log(`Registered message ${messageType} with handler (${namespace}) ${callback.name || '(anonymous)'}`);
+    });
+  }
+;
 
 /**
  * Returns a map of all registered message handlers.
@@ -41,4 +49,4 @@ const getForType = (type, namespace) => {
   return handlers[messageType];
 };
 
-export default {register, reset, getAll, getForType};
+module.exports = {register, reset, getAll, getForType};

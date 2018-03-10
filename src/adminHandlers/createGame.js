@@ -1,6 +1,6 @@
-import Game from '../games/game';
-import games from '../games/games';
-import Map from '../map';
+const Game = require('../games/game');
+const games = require('../games/games');
+const Map = require('../map');
 
 /**
  * Handles the CREATE_GAME command.
@@ -21,4 +21,4 @@ const handleCreateGame = (client, payload, respond) => {
   return respond('enter-game', game);
 };
 
-export default handleCreateGame;
+module.exports = handleCreateGame;

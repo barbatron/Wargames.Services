@@ -1,5 +1,5 @@
-import handlers from '../handlers/handlers';
-import games from '../games/games';
+const handlers = require('../handlers/handlers');
+const games = require('../games/games');
 
 handlers.register('admin.joinGame', (client, payload, respond) => {
   const game = games.getByAdminNameAndGameName(client.name, payload.name);

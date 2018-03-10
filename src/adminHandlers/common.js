@@ -1,3 +1,3 @@
 const namespace = 'admin';
 
-export {namespace};
+module.exports = {namespace};

@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "start": "npx json-server --watch \"data/db.json\"",
+    "start-db": "npx json-server --watch \"data/db.json\"",
+    "start": "node src/wsserver.js",
     "test": "karma start --single-run --browsers ChromeHeadless test/karma.conf.js"
   },
   "devDependencies": {

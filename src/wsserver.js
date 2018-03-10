@@ -1,11 +1,12 @@
-import './adminHandlers';
-import {getAll as getMessageHandlers} from './handlers/handlers';
+const adminHandlers = require('./adminHandlers/index');
+const messageHandlers = require('./handlers/handlers');
+
 
 /*
  * WS
  */
 const WebSocket = require('ws');
-const wsMessaging = require('./ws.messaging');
+const wsMessaging = require('./util/ws.messaging');
 const wss = new WebSocket.Server({
   port: 8080,
   perMessageDeflate: {
@@ -31,7 +32,7 @@ const wss = new WebSocket.Server({
 
 wss.on('connection', (ws) => {
   console.log('connection!');
-  wsMessaging.install(ws, getMessageHandlers);
+  wsMessaging.install(ws, messageHandlers);
 });
 
 wss.on('listening', () => {

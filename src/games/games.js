@@ -1,4 +1,4 @@
-import Game from './game';
+const Game = require('./game');
 
 const games = {};
 
@@ -12,4 +12,4 @@ const getByAdminName = adminName => games[adminName] || [];
 
 const getByAdminNameAndGameName = (adminName, gameName) => games[adminName][gameName];
 
-export default {create, getByAdminName, getByAdminNameAndGameName};
+module.exports = {create, getByAdminName, getByAdminNameAndGameName};
